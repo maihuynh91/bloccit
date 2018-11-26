@@ -46,7 +46,6 @@ module.exports = (sequelize, DataTypes) => {
 
     // #1 check to see if the post has any votes. If not, we return 0.
         if(this.votes.length === 0) return 0
-   
     // #2
         return this.votes
           .map((v) => { return v.value })
@@ -56,6 +55,24 @@ module.exports = (sequelize, DataTypes) => {
   Post.prototype.getFavoriteFor = function(userId){
     return this.favorites.find((favorite) => { return favorite.userId == userId });
   };
+  Post.prototype.hasUpvoteFor = function() {
+    return this.getVotes({
+      where: {
+        userId: this.userId,
+        value: 1
+      },
+    });
+  };
+
+  Post.prototype.hasDownvoteFor = function() {
+    return this.getVotes({
+      where: {
+        userId: this.userId,
+        value: -1
+      },
+    });
+  };
+
 
   return Post;
 };

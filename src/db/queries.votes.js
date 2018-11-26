@@ -9,8 +9,8 @@ module.exports = {
  user as well as the id of the post being voted on. */
       return Vote.findOne({
         where: {
-          postId: req.params.postId,
-          userId: req.user.id
+          postId: req.params.postId, //part of req
+          userId: req.user.id 
         }
       })
       .then((vote) => {

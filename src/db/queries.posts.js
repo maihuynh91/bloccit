@@ -9,8 +9,16 @@ const Favorite = require("./models").Favorite;
 module.exports = {
 	addPost(newPost, callback){
         return Post.create(newPost)
-        .then((post) => {
-            callback(null, post);
+        .then((post) => {  //create UPVOTE automatically
+            Vote.create( { //asy..so we need line 18
+                value : 1,
+                postId: post.id, //from postController line 17
+                userId: post.userId//from postController line 17
+            })
+            .then((vote)=> { //dont go back to callback until we done
+                callback(null, post);  //cause redirect happens. 
+            })               
+           
         })
         .catch((err) => {
             callback(err);
