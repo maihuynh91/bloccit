@@ -26,35 +26,62 @@ module.exports = {
       getUser(id, callback){
 //define a result object to hold the user, posts, and comments that we will return and 
 //request the User object from the database.
-           let result = {};
+        let result = {};
 
-           User.findById(id)
-           .then((user) => {
-             if(!user) {
-               callback(404);
-             } else {
-        //store the resulting user.
-               result["user"] = user;
+        User.findById(id)
+          .then((user) => {
+            if (!user) {
+              callback(404);
+            } else {
+                result["user"] = user;
 
-               Post.scope({method: ["lastFiveFor", id]}).all()
-               .then((posts) => {
-      
-                 result["posts"] = posts;
-        // execute the scope on Comment to get the last five comments made by the user.
-                 Comment.scope({method: ["lastFiveFor", id]}).all()
-                 .then((comments) => {
-     
-                   result["comments"] = comments;
-                   callback(null, result);
-                 })
-                 .catch((err) => {
-                   callback(err);
-                 })
-               })
-             }
-           })
-         }
+                Post.scope({
+                    method: ["lastFiveFor", id]
+                  }).all()
+                  .then((posts) => {
+                    result["posts"] = posts;
 
+                    Comment.scope({
+                        method: ["lastFiveFor", id]
+                      }).all()
+                      .then((comments) => {
+                        result["comments"] = comments;
 
-    
-    }
+                        User.scope({
+                            method: ["getFavoritedPosts", id]
+                          }).all()
+                          .then((favorites) => {
+                            let userFavorites = JSON.parse(JSON.stringify(favorites));
+                            let favoritePostsId = [];
+
+                            userFavorites[0].favorites.forEach((favorite) => {
+                              favoritePostsId.push(favorite.postId);
+                            });
+                            let allFavorites = [];
+
+                            Post.findAll()
+                              .then((allPosts) => {
+                                allPosts.forEach((thisPost) => {
+                                  if (favoritePostsId.includes(thisPost.id)) {
+                                    allFavorites.push({
+                                      id: thisPost.id,
+                                      title: thisPost.title,
+                                      topicId: thisPost.topicId
+                                    });
+                                  }
+                                })
+
+                                result["allFavorites"] = allFavorites;
+                                callback(null, result);
+                              })
+                            })
+                          })
+                        .catch((err) => {
+                          callback(err);
+                        })
+                      })
+                    }
+                  })
+                }
+
+ }
