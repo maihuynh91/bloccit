@@ -24,6 +24,8 @@ module.exports = {
       },
 
       getUser(id, callback){
+//define a result object to hold the user, posts, and comments that we will return and 
+//request the User object from the database.
            let result = {};
 
            User.findById(id)
@@ -31,16 +33,17 @@ module.exports = {
              if(!user) {
                callback(404);
              } else {
+        //store the resulting user.
                result["user"] = user;
-        
+
                Post.scope({method: ["lastFiveFor", id]}).all()
                .then((posts) => {
-        //store the result in the result object.
+      
                  result["posts"] = posts;
-        
+        // execute the scope on Comment to get the last five comments made by the user.
                  Comment.scope({method: ["lastFiveFor", id]}).all()
                  .then((comments) => {
-        //store the result in the object and pass the object to the callback.
+     
                    result["comments"] = comments;
                    callback(null, result);
                  })

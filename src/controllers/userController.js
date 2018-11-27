@@ -58,6 +58,7 @@ module.exports = {
            req.flash("notice", "No user found with that ID.");
            res.redirect("/");
          } else {
+           console.log(`result: ${result}`);
    // render the view and pass in the unpacked object.
            res.render("users/show", {...result});
          }
