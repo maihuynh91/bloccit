@@ -49,6 +49,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "postId",
       as: "votes"
     });
+<<<<<<< HEAD
 
     Post.prototype.getPoints = function(){
       if(this.votes.length === 0) return 0
@@ -57,6 +58,16 @@ module.exports = (sequelize, DataTypes) => {
       .reduce((prev, next) => { return prev + next });
     };
 
+=======
+
+    Post.prototype.getPoints = function(){
+      if(this.votes.length === 0) return 0
+      return this.votes
+      .map((v) => { return v.value })
+      .reduce((prev, next) => { return prev + next });
+    };
+
+>>>>>>> favoriting-assignment
     Post.prototype.hasUpvoteFor = function() {
       return this.getVotes({
         where: {
@@ -84,6 +95,7 @@ module.exports = (sequelize, DataTypes) => {
         userId: post.userId,
         postId: post.id
       });
+<<<<<<< HEAD
     });
 
     Post.afterCreate((post, callback) => {
@@ -114,16 +126,18 @@ module.exports = (sequelize, DataTypes) => {
         userId: this.userId,
         value: 1
       },
+=======
+>>>>>>> favoriting-assignment
     });
-  };
 
-  Post.prototype.hasDownvoteFor = function() {
-    return this.getVotes({
-      where: {
-        userId: this.userId,
-        value: -1
-      },
+    Post.afterCreate((post, callback) => {
+      return models.Vote.create({
+        userId: post.userId,
+        postId: post.id,
+        value: 1
+      });
     });
+
   };
 
   Post.addScope("lastFiveFor", (userId) => {
